@@ -126,7 +126,8 @@ def eval_net(model, dataset):
 			100. * correct / dataset[0].shape[0]))
 		return correct / dataset[0].shape[0]
 
-def get_mnist_loaders():
+def get_mnist_loaders(args):
+	DEVICE = 'cuda' if args.cuda else 'cpu'
 	mnist_train = torchvision.datasets.MNIST('./stash/', train=True, download=True,
 								   transform=torchvision.transforms.Compose([
 									   torchvision.transforms.ToTensor(),
@@ -140,14 +141,27 @@ def get_mnist_loaders():
 										   (0.1307,), (0.3081,))
 								   ]))
 
-	train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=False, pin_memory=True, num_workers=4)
+	train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=False, num_workers=4)
 	
-	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=128, shuffle=False, pin_memory=True, num_workers=4)
-	return train_loader, test_loader
+	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=256, shuffle=False, num_workers=4)
+	
+	mnist_train = []
+	mnist_test = []
+
+	for batch_idx, (data, target) in enumerate(train_loader):
+			data = data.to(DEVICE)
+			target = target.to(DEVICE)
+			mnist_train.append((data, target))
+
+	for batch_idx, (data, target) in enumerate(test_loader):
+			data = data.to(DEVICE)
+			target = target.to(DEVICE)
+			mnist_test.append((data, target))
+
+	return mnist_train, mnist_test
 
 def train_net(net, train_loader, test_loader, args):
 	DEVICE = 'cuda' if args.cuda else 'cpu'
-	
 	
 	optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.8)
 	criterion = nn.CrossEntropyLoss()
@@ -158,8 +172,6 @@ def train_net(net, train_loader, test_loader, args):
 		print("epoch {}".format(epoch))
 		net.train()
 		for batch_idx, (data, target) in enumerate(train_loader):
-			data = data.to(DEVICE)
-			target = target.to(DEVICE)
 			optimizer.zero_grad()
 			pred = net(data)
 			loss = criterion(pred, target)
@@ -172,8 +184,6 @@ def train_net(net, train_loader, test_loader, args):
 		crit = torch.nn.CrossEntropyLoss()
 		with torch.no_grad():
 			for data, target in test_loader:
-				data = data.to(DEVICE)
-				target = target.to(DEVICE)
 				output = net(data)
 				test_loss += crit(output, target).item()
 				pred = output.data.max(1, keepdim=True)[1]
