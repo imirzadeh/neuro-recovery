@@ -65,9 +65,11 @@ def create_pytorch_data_loader(epoch, dataset_size, model_size, cuda=False):
 	X = torch.FloatTensor(l1_acts)
 	# y = torch.FloatTensor(l1_res)
 	y = torch.FloatTensor(l1_acts)
-	dataset = TensorDataset(X, y)
+	
 	if cuda:
-		dataset = dataset.cuda()
+		X = X.cuda()
+		y = y.cuda()
+	dataset = TensorDataset(X, y)
 	loader = DataLoader(dataset=dataset, batch_size=32, shuffle=False)
 	return loader, samples
 
