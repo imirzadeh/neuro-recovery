@@ -60,6 +60,7 @@ def CKA_loss(pred, truth, svds, config, apply_penalty=False):
 
 
 def optimize_pytorch(config, args, expermient):
+	expermient.disable_mp()
 	loader, samples, svds = create_pytorch_data_loader(config['target_epoch'], args.dataset_size, args.teacher, args.cuda)
 	net = create_similarity_score_measure(args.student, args.dataset_size, args.cuda)
 	if args.cuda:

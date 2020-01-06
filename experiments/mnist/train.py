@@ -140,9 +140,9 @@ def get_mnist_loaders():
 										   (0.1307,), (0.3081,))
 								   ]))
 
-	train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=False, pin_memory=True, num_workers=6)
+	train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=False, pin_memory=True, num_workers=4)
 	
-	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=256, shuffle=False, pin_memory=True, num_workers=6)
+	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=128, shuffle=False, pin_memory=True, num_workers=4)
 	return train_loader, test_loader
 
 def train_net(net, train_loader, test_loader, args):
