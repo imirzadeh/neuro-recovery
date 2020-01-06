@@ -71,7 +71,7 @@ def optimize_pytorch(config, args, expermient):
 	# for epoch in range(24000):
 		loss = 0
 		net.train()
-		apply_penalty = epoch//(EPOCHS//10) % 2
+		apply_penalty = epoch//(EPOCHS//20) % 2
 		if apply_penalty:
 			adjust_learning_rate(optimizer, config['lr_penalty'])
 		else:
@@ -123,8 +123,8 @@ if __name__ == "__main__":
 									auto_param_logging=False,
 									auto_metric_logging=False)
 	args = parse_arguments()
-	# config = nni.get_next_parameter()
-	config = mock_nni_config()
+	config = nni.get_next_parameter()
+	#config = mock_nni_config()
 	print(args.teacher, args.student, args.epochs)
 	print(config)
 	sol = optimize_pytorch(config, args, 12)
