@@ -170,6 +170,7 @@ def train_net(net, args):
 		with torch.no_grad():
 			for data, target in test_loader:
 				data = data.to(DEVICE)
+				target = target.to(DEVICE)
 				output = net(data)
 				test_loss += crit(output, target).item()
 				pred = output.data.max(1, keepdim=True)[1]
