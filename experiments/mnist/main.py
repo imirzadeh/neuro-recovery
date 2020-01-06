@@ -112,7 +112,7 @@ def evaluate_solution(sol, args, config):
 			acc_before = eval_net(net, dataset)
 			for param in net.W1.parameters():
 				param.requires_grad = False
-			acc_after = train_net(net)
+			acc_after = train_net(net, args)
 	return max(acc_before, acc_after)
 		
 

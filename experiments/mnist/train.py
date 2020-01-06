@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 
-DEVICE = 'cuda:0'
+DEVICE = 'cuda'
 
 class MLP(nn.Module):
 	def __init__(self, num_hidden):
@@ -127,31 +127,31 @@ def eval_net(model, dataset):
 		return correct / dataset[0].shape[0]
 
 
-def train_net(net):
-	DEVICE = 'cuda'
-	train_loader = torch.utils.data.DataLoader(
-		torchvision.datasets.MNIST('./stash/', train=True, download=True,
+def train_net(net, args):
+	DEVICE = 'cuda' if args.cuda() else 'cpu'
+	mnist_train = torchvision.datasets.MNIST('./stash/', train=True, download=True,
 								   transform=torchvision.transforms.Compose([
 									   torchvision.transforms.ToTensor(),
 									   torchvision.transforms.Normalize(
 										   (0.1307,), (0.3081,))
-								   ])),
-		batch_size=64, shuffle=False)
+								   ])).to(DEVICE)
+	mnist_test = torchvision.datasets.MNIST('./stash/', train=False, download=True,
+								   transform=torchvision.transforms.Compose([
+									   torchvision.transforms.ToTensor(),
+									   torchvision.transforms.Normalize(
+										   (0.1307,), (0.3081,))
+								   ])).to(DEVICE)
+
+	train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=False)
 	
-	test_loader = torch.utils.data.DataLoader(
-		torchvision.datasets.MNIST('./stash/', train=False, download=True,
-								   transform=torchvision.transforms.Compose([
-									   torchvision.transforms.ToTensor(),
-									   torchvision.transforms.Normalize(
-										   (0.1307,), (0.3081,))
-								   ])),
-		batch_size=64, shuffle=False)
+	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=64, shuffle=False)
 	
 	optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.8)
 	criterion = nn.CrossEntropyLoss()
 	best_acc = 0
+
+	net = net.to(DEVICE)
 	for epoch in range(1, 4):
-		net = net.to(DEVICE)
 		print("epoch {}".format(epoch))
 		net.train()
 		for batch_idx, (data, target) in enumerate(train_loader):
