@@ -128,7 +128,7 @@ def eval_net(model, dataset):
 
 
 def train_net(net, args):
-	DEVICE = 'cuda' if args.cuda() else 'cpu'
+	DEVICE = 'cuda' if args.cuda else 'cpu'
 	mnist_train = torchvision.datasets.MNIST('./stash/', train=True, download=True,
 								   transform=torchvision.transforms.Compose([
 									   torchvision.transforms.ToTensor(),
