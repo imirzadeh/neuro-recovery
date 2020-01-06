@@ -18,19 +18,23 @@ def adjust_learning_rate(optimizer, lr):
 	for param_group in optimizer.param_groups:
 		param_group['lr'] = lr
 
-def create_similarity_score_measure(model_size, dataset_size):
+def create_similarity_score_measure(model_size, dataset_size, use_cuda=False):
 
 	class CKA(nn.Module):
-		def __init__(self, model_size, dataset_size):
+		def __init__(self, model_size, dataset_size, use_cuda=False):
 			super(CKA, self).__init__()
 			self.Y = nn.Linear(dataset_size, model_size)
 			self.model_size = model_size
 			self.dataset_size = dataset_size
+			if use_cuda:
+				self.eye = torch.eye(self.dataset_size).cuda()
+			else:
+				self.eye = torch.eye(self.dataset_size)
 		
 		def forward(self, x):
-			return self.Y(torch.eye(self.dataset_size))
+			return self.Y(self.eye)
 	
-	net = CKA(model_size, dataset_size)
+	net = CKA(model_size, dataset_size, use_cuda)
 	return net
 
 
@@ -56,8 +60,10 @@ def CKA_loss(pred, truth, config, apply_penalty=False):
 
 
 def optimize_pytorch(config, args, expermient):
-	loader, samples = create_pytorch_data_loader(config['target_epoch'], args.dataset_size, args.teacher)
-	net = create_similarity_score_measure(args.student, args.dataset_size)
+	loader, samples = create_pytorch_data_loader(config['target_epoch'], args.dataset_size, args.teacher, args.cuda)
+	net = create_similarity_score_measure(args.student, args.dataset_size, args.cuda)
+	if args.cuda:
+		net = net.cuda()
 	optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.8)
 	iter = 0
 	EPOCHS = args.epochs
@@ -70,7 +76,6 @@ def optimize_pytorch(config, args, expermient):
 			adjust_learning_rate(optimizer, config['lr_penalty'])
 		else:
 			adjust_learning_rate(optimizer, config['lr_no_penalty'])
-
 		for (data, target) in loader:
 			iter += 1
 			optimizer.zero_grad()
@@ -80,9 +85,10 @@ def optimize_pytorch(config, args, expermient):
 			optimizer.step()
 		if epoch % args.log_every == 0:
 			print(epoch, ' => ', loss.item())
-			print(np.linalg.norm(net.Y.weight.t().detach().numpy(), 'fro'), np.linalg.norm(net.Y.weight.t().detach().numpy(), 'nuc'))
+			print(np.linalg.norm(net.Y.weight.t().cpu().detach().numpy(), 'fro'), np.linalg.norm(net.Y.weight.t().cpu().detach().numpy(), 'nuc'))
 			print('**'*20)
-	res = net.Y.weight.t().detach().numpy()
+	
+	res = net.Y.weight.t().cpu().detach().numpy()
 	return res
 
 def from_acts_to_weights(acts, dataset_size, inverse=False):
@@ -117,7 +123,7 @@ if __name__ == "__main__":
 									auto_param_logging=False,
 									auto_metric_logging=False)
 	args = parse_arguments()
-	config = nni.get_next_parameter()
+	# config = nni.get_next_parameter()
 	config = mock_nni_config()
 	print(args.teacher, args.student, args.epochs)
 	print(config)

@@ -44,7 +44,7 @@ def get_model_acts(model, dataset):
 
 	return l1_acts.T, l2_acts.T
 
-def create_pytorch_data_loader(epoch, dataset_size, model_size):
+def create_pytorch_data_loader(epoch, dataset_size, model_size, cuda=False):
 	dataset = load_dataset(make_tensors=True, num_data_points=dataset_size)
 	trials = list(range(0, 8))
 	l1_acts = []
@@ -66,6 +66,8 @@ def create_pytorch_data_loader(epoch, dataset_size, model_size):
 	# y = torch.FloatTensor(l1_res)
 	y = torch.FloatTensor(l1_acts)
 	dataset = TensorDataset(X, y)
+	if cuda:
+		dataset = dataset.cuda()
 	loader = DataLoader(dataset=dataset, batch_size=32, shuffle=False)
 	return loader, samples
 
