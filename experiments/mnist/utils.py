@@ -26,7 +26,7 @@ def parse_arguments():
 
 
 def mock_nni_config():
-	return  { "lr_no_penalty": 0.01,
+	return  { "lr_no_penalty": 0.05,
 			 "lr_penalty": 0.001,
 			 "lambda_fro": 0.1,
 			 "lambda_svd":0.1,

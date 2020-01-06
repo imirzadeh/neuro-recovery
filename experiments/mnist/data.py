@@ -66,7 +66,7 @@ def create_pytorch_data_loader(epoch, dataset_size, model_size, cuda=False):
 	# y = torch.FloatTensor(l1_res)
 	y = torch.FloatTensor(l1_acts)
 	svds = []
-	for i in range(8):
+	for i in range(4):
 		u1, s1, v1 = torch.svd(y[i])
 		if cuda:
 			s1 = s1.cuda()

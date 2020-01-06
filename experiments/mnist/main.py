@@ -52,7 +52,7 @@ def CKA_loss(pred, truth, svds, config, apply_penalty=False):
 		# u3, s3, v3 = torch.svd(truth[2])
 		# u4, s4, v4 = torch.svd(truth[3])
 		u_m, s_m, v_m = torch.svd(pred)
-		penalty_svd = (torch.dist(s_m, svds[0][:8]) + torch.dist(s_m, svds[1][:8]) + torch.dist(s_m, svds[2][:8]) + torch.dist(s_m, svds[3][:8]))
+		penalty_svd = (torch.dist(s_m, svds[0][:8]) + torch.dist(s_m, svds[1][:8]) + torch.dist(s_m, svds[2][:8]))
 		penalty_minmax = torch.dist(torch.min(truth), torch.min(pred))**2 + torch.dist(torch.max(truth), torch.max(pred))**2
 		penalty = config['lambda_fro']*penalty_fro + config['lambda_svd']*penalty_svd + config['lambda_minmax']*penalty_minmax
 

@@ -169,6 +169,7 @@ def train_net(net, args):
 		crit = torch.nn.CrossEntropyLoss()
 		with torch.no_grad():
 			for data, target in test_loader:
+				data = data.to(DEVICE)
 				output = net(data)
 				test_loss += crit(output, target).item()
 				pred = output.data.max(1, keepdim=True)[1]
