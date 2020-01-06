@@ -103,7 +103,7 @@ def from_acts_to_weights(acts, dataset_size, inverse=False):
 def evaluate_solution(sol, args, config):
 	acts, mean_acts = get_acts_and_mean_acts(args, config)
 	#dataset = load_dataset(make_tensors=True, num_data_points=args.dataset_size)
-	mnist_train, mnist_test = get_mnist_loaders()
+	mnist_train, mnist_test = get_mnist_loaders(args)
 	for b in range(8):
 		for inv in [True, False]:
 			print('===================== {} ====================='.format(b))
