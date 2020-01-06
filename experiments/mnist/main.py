@@ -122,7 +122,12 @@ if __name__ == "__main__":
 									project_name="nni-opt-0",
 										workspace="neurozip",
 									auto_param_logging=False,
-									auto_metric_logging=False)
+									auto_metric_logging=False,
+									log_env_gpu=False,
+									auto_output_logging=False,
+									log_env_details=False,
+									log_env_cpu=False,
+									log_git_patch=False)
 	experiment.disable_mp()
 	args = parse_arguments()
 	# config = nni.get_next_parameter()
