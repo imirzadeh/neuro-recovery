@@ -1,0 +1,22 @@
+authorName: Iman Mirzadeh
+experimentName: NeuroZip
+trialConcurrency: 2
+maxExecDuration: 8h
+maxTrialNum: 8
+
+#choice: local, remote, pai
+trainingServicePlatform: local
+searchSpacePath: search_space.json
+#choice: true, false
+useAnnotation: false
+tuner:
+  #choice: TPE, Random, Anneal, Evolution, BatchTuner
+  #SMAC (SMAC should be installed through nnictl)
+  builtinTunerName: GridSearch
+  # classArgs:
+  #   #choice: maximize, minimize
+  #   # optimize_mode: maximize
+trial:
+  command: python main.py --epochs 5000 --teacher 16 --student 8 --dataset_size 500 --cuda 0
+  codeDir: .
+  gpuNum: 0

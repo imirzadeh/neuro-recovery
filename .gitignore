@@ -274,6 +274,8 @@ tags
 [._]*.un~
 stash
 stash/*
+models
+models/
 .python-version
 ./.python-version
 
