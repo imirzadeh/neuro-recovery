@@ -134,17 +134,17 @@ def train_net(net, args):
 									   torchvision.transforms.ToTensor(),
 									   torchvision.transforms.Normalize(
 										   (0.1307,), (0.3081,))
-								   ])).to(DEVICE)
+								   ]))
 	mnist_test = torchvision.datasets.MNIST('./stash/', train=False, download=True,
 								   transform=torchvision.transforms.Compose([
 									   torchvision.transforms.ToTensor(),
 									   torchvision.transforms.Normalize(
 										   (0.1307,), (0.3081,))
-								   ])).to(DEVICE)
+								   ]))
 
-	train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=False)
+	train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=False, pin_memory=True)
 	
-	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=64, shuffle=False)
+	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=64, shuffle=False, pin_memory=True)
 	
 	optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.8)
 	criterion = nn.CrossEntropyLoss()
