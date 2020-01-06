@@ -1,8 +1,8 @@
 authorName: Iman Mirzadeh
 experimentName: NeuroZip
-trialConcurrency: 2
-maxExecDuration: 11h
-maxTrialNum: 400
+trialConcurrency: 4
+maxExecDuration: 24h
+maxTrialNum: 800
 
 #choice: local, remote, pai
 trainingServicePlatform: local

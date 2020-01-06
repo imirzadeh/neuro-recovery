@@ -102,7 +102,7 @@ def from_acts_to_weights(acts, dataset_size, inverse=False):
 
 def evaluate_solution(sol, args, config):
 	acts, mean_acts = get_acts_and_mean_acts(args, config)
-	dataset = load_dataset(make_tensors=True, num_data_points=args.dataset_size)
+	#dataset = load_dataset(make_tensors=True, num_data_points=args.dataset_size)
 	mnist_train, mnist_test = get_mnist_loaders()
 	for b in range(8):
 		for inv in [True, False]:
@@ -110,7 +110,8 @@ def evaluate_solution(sol, args, config):
 			w = from_acts_to_weights(sol+mean_acts[args.student][1][b], args.dataset_size, inv)#+mean_acts[8][1][b], False)
 			net = MLP(args.student)
 			net.W1.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
-			acc_before = eval_net(net, dataset)
+			#acc_before = eval_net(net, dataset)
+			acc_before = 0.0
 			for param in net.W1.parameters():
 				param.requires_grad = False
 			acc_after = train_net(net, mnist_train, mnist_test, args)
@@ -130,8 +131,8 @@ if __name__ == "__main__":
 									log_git_patch=False)
 	experiment.disable_mp()
 	args = parse_arguments()
-	# config = nni.get_next_parameter()
-	config = mock_nni_config()
+	config = nni.get_next_parameter()
+	#config = mock_nni_config()
 	print(args.teacher, args.student, args.epochs)
 	print(config)
 	sol = optimize_pytorch(config, args, 12)

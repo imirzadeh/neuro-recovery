@@ -13,8 +13,8 @@ def str2bool(v):
 	
 def parse_arguments():
 	parser = argparse.ArgumentParser(description='Neuro Zip')
-	parser.add_argument('--epochs', default=50000, type=int,  help='number of total epochs to run')
-	parser.add_argument('--log_every', default=1000, type=int,  help='number of total epochs to run')
+	parser.add_argument('--epochs', default=250000, type=int,  help='number of total epochs to run')
+	parser.add_argument('--log_every', default=10000, type=int,  help='number of total epochs to run')
 	parser.add_argument('--dataset', default='mnist', type=str, help='dataset. can be either cifar10 or cifar100')
 	parser.add_argument('--teacher', default=16, type=int, help='teacher size')
 	parser.add_argument('--student', '--model', default=8, type=int, help='student size')
