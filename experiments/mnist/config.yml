@@ -1,6 +1,6 @@
 authorName: Iman Mirzadeh
 experimentName: NeuroZip
-trialConcurrency: 6
+trialConcurrency: 4
 maxExecDuration: 8h
 maxTrialNum: 200
 
@@ -17,6 +17,6 @@ tuner:
   #   #choice: maximize, minimize
   #   # optimize_mode: maximize
 trial:
-  command: python main.py --epochs 50000 --teacher 16 --student 8 --dataset_size 500 --cuda 0
+  command: python main.py --epochs 10001 --teacher 16 --student 8 --dataset_size 500 --cuda 0
   codeDir: .
   gpuNum: 0
