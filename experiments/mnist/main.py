@@ -38,7 +38,7 @@ def create_similarity_score_measure(model_size, dataset_size, use_cuda=False):
 	return net
 
 
-def CKA_loss(pred, truth, config, apply_penalty=False):
+def CKA_loss(pred, truth, svds, config, apply_penalty=False):
 	up = torch.pow(torch.norm(torch.matmul(truth, pred), p='fro', dim=(1, 2)), 2)  # ||Y^T X||_F^2
 	YY = torch.norm(torch.matmul(truth, truth.transpose(1, 2)), p='fro', dim=(1, 2))
 	XX = torch.norm(torch.matmul(pred.transpose(0, 1), pred), p='fro')
@@ -47,12 +47,12 @@ def CKA_loss(pred, truth, config, apply_penalty=False):
 		penalty = 0.0
 	else:
 		penalty_fro = torch.mean((torch.norm(pred, 'fro') - torch.norm(truth, p='fro', dim=(1, 2))) ** 2)
-		u1, s1, v1 = torch.svd(truth[0])
-		u2, s2, v2 = torch.svd(truth[1])
-		u3, s3, v3 = torch.svd(truth[2])
-		u4, s4, v4 = torch.svd(truth[3])
+		# u1, s1, v1 = torch.svd(truth[0])
+		# u2, s2, v2 = torch.svd(truth[1])
+		# u3, s3, v3 = torch.svd(truth[2])
+		# u4, s4, v4 = torch.svd(truth[3])
 		u_m, s_m, v_m = torch.svd(pred)
-		penalty_svd = (torch.dist(s_m, s1[:8]) + torch.dist(s_m, s2[:8]) + torch.dist(s_m, s3[:8]) + torch.dist(s_m, s4[:8]))
+		penalty_svd = (torch.dist(s_m, svds[0][:8]) + torch.dist(s_m, svds[1][:8]) + torch.dist(s_m, svds[2][:8]) + torch.dist(s_m, svds[3][:8]))
 		penalty_minmax = torch.dist(torch.min(truth), torch.min(pred))**2 + torch.dist(torch.max(truth), torch.max(pred))**2
 		penalty = config['lambda_fro']*penalty_fro + config['lambda_svd']*penalty_svd + config['lambda_minmax']*penalty_minmax
 
@@ -60,7 +60,7 @@ def CKA_loss(pred, truth, config, apply_penalty=False):
 
 
 def optimize_pytorch(config, args, expermient):
-	loader, samples = create_pytorch_data_loader(config['target_epoch'], args.dataset_size, args.teacher, args.cuda)
+	loader, samples, svds = create_pytorch_data_loader(config['target_epoch'], args.dataset_size, args.teacher, args.cuda)
 	net = create_similarity_score_measure(args.student, args.dataset_size, args.cuda)
 	if args.cuda:
 		net = net.cuda()
@@ -80,7 +80,7 @@ def optimize_pytorch(config, args, expermient):
 			iter += 1
 			optimizer.zero_grad()
 			pred = net(data)
-			loss = CKA_loss(pred, target, config, apply_penalty)
+			loss = CKA_loss(pred, target, svds, config, apply_penalty)
 			loss.backward()
 			optimizer.step()
 		if epoch % args.log_every == 0:
@@ -122,6 +122,7 @@ if __name__ == "__main__":
 										workspace="neurozip",
 									auto_param_logging=False,
 									auto_metric_logging=False)
+	experiment.disable_mp()
 	args = parse_arguments()
 	# config = nni.get_next_parameter()
 	config = mock_nni_config()

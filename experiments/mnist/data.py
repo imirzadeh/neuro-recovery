@@ -65,13 +65,18 @@ def create_pytorch_data_loader(epoch, dataset_size, model_size, cuda=False):
 	X = torch.FloatTensor(l1_acts)
 	# y = torch.FloatTensor(l1_res)
 	y = torch.FloatTensor(l1_acts)
-	
+	svds = []
+	for i in range(8):
+		u1, s1, v1 = torch.svd(y[i])
+		if cuda:
+			s1 = s1.cuda()
+		svds.append(s1)
 	if cuda:
 		X = X.cuda()
 		y = y.cuda()
 	dataset = TensorDataset(X, y)
 	loader = DataLoader(dataset=dataset, batch_size=128, shuffle=False)
-	return loader, samples
+	return loader, samples, svds
 
 def get_acts_and_mean_acts(args, config):
 	dataset_size = args.dataset_size
