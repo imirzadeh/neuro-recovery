@@ -97,7 +97,7 @@ def from_acts_to_weights(acts, dataset_size, inverse=False):
 def evaluate_solution(sol, args, config):
 	acts, mean_acts = get_acts_and_mean_acts(args, config)
 	dataset = load_dataset(make_tensors=True, num_data_points=args.dataset_size)
-	for b in range(4):
+	for b in range(8):
 		for inv in [True, False]:
 			print('===================== {} ====================='.format(b))
 			w = from_acts_to_weights(sol+mean_acts[args.student][1][b], args.dataset_size, inv)#+mean_acts[8][1][b], False)
