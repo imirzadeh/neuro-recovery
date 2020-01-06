@@ -17,6 +17,6 @@ tuner:
   #   #choice: maximize, minimize
   #   # optimize_mode: maximize
 trial:
-  command: python main.py --epochs 200001 --teacher 16 --student 8 --dataset_size 500 --cuda 1
+  command: python main.py --epochs 50001 --teacher 16 --student 8 --dataset_size 500 --cuda 1
   codeDir: .
   gpuNum: 1

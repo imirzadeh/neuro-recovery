@@ -70,7 +70,7 @@ def create_pytorch_data_loader(epoch, dataset_size, model_size, cuda=False):
 		X = X.cuda()
 		y = y.cuda()
 	dataset = TensorDataset(X, y)
-	loader = DataLoader(dataset=dataset, batch_size=32, shuffle=False)
+	loader = DataLoader(dataset=dataset, batch_size=128, shuffle=False)
 	return loader, samples
 
 def get_acts_and_mean_acts(args, config):

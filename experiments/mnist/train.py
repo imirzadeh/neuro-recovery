@@ -144,7 +144,7 @@ def train_net(net, args):
 
 	train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=False, pin_memory=True)
 	
-	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=64, shuffle=False, pin_memory=True)
+	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=256, shuffle=False, pin_memory=True)
 	
 	optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.8)
 	criterion = nn.CrossEntropyLoss()
