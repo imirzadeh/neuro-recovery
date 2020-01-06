@@ -119,30 +119,29 @@ def evaluate_solution(sol, args, config):
 		
 
 if __name__ == "__main__":
-	experiment = Experiment(api_key="1UNrcJdirU9MEY0RC3UCU7eAg",
-									project_name="nni-opt-0",
-										workspace="neurozip",
-									auto_param_logging=False,
-									auto_metric_logging=False,
-									log_env_gpu=False,
-									auto_output_logging=False,
-									log_env_details=False,
-									log_env_cpu=False,
-									log_git_patch=False)
-	experiment.disable_mp()
+	# experiment = Experiment(api_key="1UNrcJdirU9MEY0RC3UCU7eAg",
+	# 								project_name="nni-opt-0",
+	# 									workspace="neurozip",
+	# 								auto_param_logging=False,
+	# 								auto_metric_logging=False,
+	# 								log_env_gpu=False,
+	# 								auto_output_logging=False,
+	# 								log_env_details=False,
+	# 								log_env_cpu=False,
+	# 								log_git_patch=False)
+	trial_id = os.environ.get('NNI_TRIAL_JOB_ID')
 	args = parse_arguments()
 	config = nni.get_next_parameter()
 	#config = mock_nni_config()
 	print(args.teacher, args.student, args.epochs)
 	print(config)
 	sol = optimize_pytorch(config, args, 12)
-	solution_file = './sols/{}.npy'.format(experiment.get_key())
+	solution_file = './sols/{}.npy'.format(trial_id)
 	np.save(solution_file, sol)
-	experiment.log_asset(solution_file)
 	score = evaluate_solution(sol, args, config)
 	print("***"*20)
 	print(score)
 	nni.report_final_result(score)
-	experiment.log_parameters(config)
-	experiment.log_metric(name='score', value=score)
-	experiment.end()
+	# experiment.log_parameters(config)
+	# experiment.log_metric(name='score', value=score)
+	# experiment.end()
