@@ -128,7 +128,7 @@ def eval_net(model, dataset):
 
 
 def train_net(net):
-	DEVICE = 'cuda:0'
+	DEVICE = 'cpu'
 	train_loader = torch.utils.data.DataLoader(
 		torchvision.datasets.MNIST('./stash/', train=True, download=True,
 								   transform=torchvision.transforms.Compose([
