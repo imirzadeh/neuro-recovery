@@ -8,7 +8,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from numpy.linalg import lstsq
 from torch.utils.data import TensorDataset, DataLoader
-from train import MLP, train_net, eval_net
+from train import MLP, train_net, eval_net, get_mnist_loaders
 import nni
 from utils import parse_arguments, inverse_lrelu, mock_nni_config
 from data import create_pytorch_data_loader, get_input_data, get_acts_and_mean_acts, load_dataset
@@ -103,6 +103,7 @@ def from_acts_to_weights(acts, dataset_size, inverse=False):
 def evaluate_solution(sol, args, config):
 	acts, mean_acts = get_acts_and_mean_acts(args, config)
 	dataset = load_dataset(make_tensors=True, num_data_points=args.dataset_size)
+	mnist_train, mnist_test = get_mnist_loaders()
 	for b in range(8):
 		for inv in [True, False]:
 			print('===================== {} ====================='.format(b))
@@ -112,7 +113,7 @@ def evaluate_solution(sol, args, config):
 			acc_before = eval_net(net, dataset)
 			for param in net.W1.parameters():
 				param.requires_grad = False
-			acc_after = train_net(net, args)
+			acc_after = train_net(net, mnist_train, mnist_test, args)
 	return max(acc_before, acc_after)
 		
 
@@ -129,6 +130,8 @@ if __name__ == "__main__":
 	print(args.teacher, args.student, args.epochs)
 	print(config)
 	sol = optimize_pytorch(config, args, 12)
+	solution_file = './sols/{}.npy'.format(experiment.get_key())
+	np.save(, sol)
 	score = evaluate_solution(sol, args, config)
 	print("***"*20)
 	print(score)

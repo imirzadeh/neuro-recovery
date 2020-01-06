@@ -126,9 +126,7 @@ def eval_net(model, dataset):
 			100. * correct / dataset[0].shape[0]))
 		return correct / dataset[0].shape[0]
 
-
-def train_net(net, args):
-	DEVICE = 'cuda' if args.cuda else 'cpu'
+def get_mnist_loaders():
 	mnist_train = torchvision.datasets.MNIST('./stash/', train=True, download=True,
 								   transform=torchvision.transforms.Compose([
 									   torchvision.transforms.ToTensor(),
@@ -145,6 +143,11 @@ def train_net(net, args):
 	train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=False, pin_memory=True)
 	
 	test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=256, shuffle=False, pin_memory=True)
+	return train_loader, test_loader
+
+def train_net(net, train_loader, test_loader, args):
+	DEVICE = 'cuda' if args.cuda else 'cpu'
+	
 	
 	optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.8)
 	criterion = nn.CrossEntropyLoss()
