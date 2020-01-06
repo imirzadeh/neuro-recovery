@@ -1,4 +1,4 @@
-from comet_ml import Experiment
+# from comet_ml import Experiment
 import torch
 import torchvision
 import numpy as np
@@ -188,15 +188,15 @@ def train_net(net, train_loader, test_loader, args):
 				test_loss += crit(output, target).item()
 				pred = output.data.max(1, keepdim=True)[1]
 				correct += pred.eq(target.data.view_as(pred)).sum()
-		test_loss /= len(test_loader)
+		test_loss /= 10000
 		correct = correct.to('cpu')
 		# print('float {}'.format(float(correct)))
-		best_acc = max(best_acc, float(correct)/len(test_loader))
+		best_acc = max(best_acc, float(correct)/10000)
 		#experiment.log_metric(name='val-acc', step=epoch, value=correct*100.0/len(test_loader.dataset))
 		#experiment.log_metric(name='val-loss', step=epoch, value=test_loss)
 		print('\nTest set: Avg. loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-			test_loss, correct, len(test_loader),
-			100. * correct / len(test_loader)))
+			test_loss, correct, 10000,
+			100. * correct / 10000))
 	return best_acc
 
 			
