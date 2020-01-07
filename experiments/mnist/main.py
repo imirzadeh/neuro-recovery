@@ -3,11 +3,8 @@ import os
 import numpy as np
 import torch
 import torch.nn as nn
-import torchvision
 import torch.optim as optim
-import torch.nn.functional as F
 from numpy.linalg import lstsq
-from torch.utils.data import TensorDataset, DataLoader
 from train import MLP, train_net, eval_net, get_mnist_loaders
 import nni
 from utils import parse_arguments, inverse_lrelu, mock_nni_config
@@ -60,8 +57,11 @@ def CKA_loss(pred, truth, svds, config, apply_penalty=False):
 
 
 def optimize_pytorch(config, args, expermient):
-	loader, samples, svds = create_pytorch_data_loader(config['target_epoch'], args.dataset_size, args.teacher, args.cuda)
+	loader, samples, svds = create_pytorch_data_loader(config['target_epoch'], args.dataset_size, args.teacher, args.centered, args.cuda)
 	net = create_similarity_score_measure(args.student, args.dataset_size, args.cuda)
+	# if args.resume:
+	# 	w = np.load(args.resume)
+	# 	net.Y.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
 	if args.cuda:
 		net = net.cuda()
 	optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.8)
@@ -71,7 +71,9 @@ def optimize_pytorch(config, args, expermient):
 	# for epoch in range(24000):
 		loss = 0
 		net.train()
-		apply_penalty = epoch//(EPOCHS//10) % 2
+		apply_penalty = epoch//(EPOCHS//3) % 2
+		# if args.resume:
+		# 	apply_penalty = 0
 		if apply_penalty:
 			adjust_learning_rate(optimizer, config['lr_penalty'])
 		else:
@@ -104,10 +106,9 @@ def evaluate_solution(sol, args, config):
 	acts, mean_acts = get_acts_and_mean_acts(args, config)
 	#dataset = load_dataset(make_tensors=True, num_data_points=args.dataset_size)
 	mnist_train, mnist_test = get_mnist_loaders(args)
-	for b in range(8):
+	if args.centered:
 		for inv in [True, False]:
-			print('===================== {} ====================='.format(b))
-			w = from_acts_to_weights(sol+mean_acts[args.student][1][b], args.dataset_size, inv)#+mean_acts[8][1][b], False)
+			w = from_acts_to_weights(sol, args.dataset_size, inv)
 			net = MLP(args.student)
 			net.W1.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
 			#acc_before = eval_net(net, dataset)
@@ -115,6 +116,18 @@ def evaluate_solution(sol, args, config):
 			for param in net.W1.parameters():
 				param.requires_grad = False
 			acc_after = train_net(net, mnist_train, mnist_test, args)
+	else:
+		for b in range(8):
+			for inv in [True, False]:
+				print('===================== {} ====================='.format(b))
+				w = from_acts_to_weights(sol+mean_acts[args.student][1][b], args.dataset_size, inv)#+mean_acts[8][1][b], False)
+				net = MLP(args.student)
+				net.W1.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
+				#acc_before = eval_net(net, dataset)
+				acc_before = 0.0
+				for param in net.W1.parameters():
+					param.requires_grad = False
+				acc_after = train_net(net, mnist_train, mnist_test, args)
 	return max(acc_before, acc_after)
 		
 
@@ -132,7 +145,7 @@ if __name__ == "__main__":
 	trial_id = os.environ.get('NNI_TRIAL_JOB_ID')
 	args = parse_arguments()
 	config = nni.get_next_parameter()
-	#config = mock_nni_config()
+	# config = mock_nni_config()
 	print(args.teacher, args.student, args.epochs)
 	print(config)
 	sol = optimize_pytorch(config, args, 12)

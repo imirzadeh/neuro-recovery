@@ -44,7 +44,7 @@ def get_model_acts(model, dataset):
 
 	return l1_acts.T, l2_acts.T
 
-def create_pytorch_data_loader(epoch, dataset_size, model_size, cuda=False):
+def create_pytorch_data_loader(epoch, dataset_size, model_size, centered_acts, cuda=False):
 	dataset = load_dataset(make_tensors=True, num_data_points=dataset_size)
 	trials = list(range(0, 8))
 	l1_acts = []
@@ -55,8 +55,11 @@ def create_pytorch_data_loader(epoch, dataset_size, model_size, cuda=False):
 	for trial in trials:
 		model = read_model(size=model_size, trial=trial, epoch=epoch)
 		l1, l2 = get_model_acts(model, dataset)
-		shifted_l1 = l1 - np.mean(l1, 0, keepdims=True)
-		sample = shifted_l1
+		if centered_acts:
+			shifted_l1 = l1 - np.mean(l1, 0, keepdims=True)
+			sample = shifted_l1
+		else:
+			sample = l1
 		samples.append(sample)
 		l1_acts.append(sample.T)
 		l1_res.append([1.0])
