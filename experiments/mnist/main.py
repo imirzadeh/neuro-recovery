@@ -35,7 +35,7 @@ def create_similarity_score_measure(model_size, dataset_size, use_cuda=False):
 	return net
 
 
-def CKA_loss(pred, truth, svds, config, apply_penalty=False):
+def CKA_loss(pred, truth, svds, config, args, apply_penalty=False):
 	up = torch.pow(torch.norm(torch.matmul(truth, pred), p='fro', dim=(1, 2)), 2)  # ||Y^T X||_F^2
 	YY = torch.norm(torch.matmul(truth, truth.transpose(1, 2)), p='fro', dim=(1, 2))
 	XX = torch.norm(torch.matmul(pred.transpose(0, 1), pred), p='fro')
@@ -43,15 +43,16 @@ def CKA_loss(pred, truth, svds, config, apply_penalty=False):
 	if not apply_penalty:
 		penalty = 0.0
 	else:
-		penalty_fro = torch.mean((torch.norm(pred, 'fro') - torch.norm(truth, p='fro', dim=(1, 2))) ** 2)
-		# u1, s1, v1 = torch.svd(truth[0])
-		# u2, s2, v2 = torch.svd(truth[1])
-		# u3, s3, v3 = torch.svd(truth[2])
-		# u4, s4, v4 = torch.svd(truth[3])
-		u_m, s_m, v_m = torch.svd(pred)
-		penalty_svd = (torch.dist(s_m, svds[0][:8]) + torch.dist(s_m, svds[1][:8]) + torch.dist(s_m, svds[2][:8]))
-		penalty_minmax = torch.dist(torch.min(truth), torch.min(pred))**2 + torch.dist(torch.max(truth), torch.max(pred))**2
-		penalty = config['lambda_fro']*penalty_fro + config['lambda_svd']*penalty_svd + config['lambda_minmax']*penalty_minmax
+		if args.normalize_penalty:
+			penalty_fro = torch.mean((torch.norm(pred, 'fro') - torch.norm(truth, p='fro', dim=(1, 2))) ** 2 / (torch.norm(truth, p='fro', dim=(1, 2))))
+			u_m, s_m, v_m = torch.svd(pred)
+			penalty_svd = (0.25*(torch.dist(s_m, svds[0][:8]) + torch.dist(s_m, svds[1][:8]) + torch.dist(s_m, svds[2][:8])))/(torch.mean(torch.norm(truth, p='nuc', dim=(1, 2))))
+		else:
+			penalty_fro = torch.mean((torch.norm(pred, 'fro') - torch.norm(truth, p='fro', dim=(1, 2))) ** 2)
+			u_m, s_m, v_m = torch.svd(pred)
+			penalty_svd = (torch.dist(s_m, svds[0][:8]) + torch.dist(s_m, svds[1][:8]) + torch.dist(s_m, svds[2][:8]))
+			# penalty_minmax = torch.dist(torch.min(truth), torch.min(pred))**2 + torch.dist(torch.max(truth), torch.max(pred))**2
+		penalty = config['lambda_fro']*penalty_fro + config['lambda_svd']*penalty_svd #+ config['lambda_minmax']*penalty_minmax
 
 	return (1.0 - torch.mean(torch.div(up, down))) + penalty
 
@@ -59,9 +60,9 @@ def CKA_loss(pred, truth, svds, config, apply_penalty=False):
 def optimize_pytorch(config, args, expermient):
 	loader, samples, svds = create_pytorch_data_loader(config['target_epoch'], args.dataset_size, args.teacher, args.centered, args.cuda)
 	net = create_similarity_score_measure(args.student, args.dataset_size, args.cuda)
-	# if args.resume:
-	# 	w = np.load(args.resume)
-	# 	net.Y.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
+	if args.resume:
+		w = np.load(args.resume)
+		net.Y.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
 	if args.cuda:
 		net = net.cuda()
 	optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.8)
@@ -72,8 +73,8 @@ def optimize_pytorch(config, args, expermient):
 		loss = 0
 		net.train()
 		apply_penalty = epoch//(EPOCHS//3) % 2
-		# if args.resume:
-		# 	apply_penalty = 0
+		if args.resume:
+			apply_penalty = 0
 		if apply_penalty:
 			adjust_learning_rate(optimizer, config['lr_penalty'])
 		else:
@@ -82,9 +83,11 @@ def optimize_pytorch(config, args, expermient):
 			iter += 1
 			optimizer.zero_grad()
 			pred = net(data)
-			loss = CKA_loss(pred, target, svds, config, apply_penalty)
+			loss = CKA_loss(pred, target, svds, config, args, apply_penalty)
 			loss.backward()
 			optimizer.step()
+			net.Y.weight.data.clamp_(min=torch.min(target), max=torch.max(target))
+
 		if epoch % args.log_every == 0:
 			print(epoch, ' => ', loss.item())
 			print(np.linalg.norm(net.Y.weight.t().cpu().detach().numpy(), 'fro'), np.linalg.norm(net.Y.weight.t().cpu().detach().numpy(), 'nuc'))
@@ -106,16 +109,17 @@ def evaluate_solution(sol, args, config):
 	acts, mean_acts = get_acts_and_mean_acts(args, config)
 	#dataset = load_dataset(make_tensors=True, num_data_points=args.dataset_size)
 	mnist_train, mnist_test = get_mnist_loaders(args)
+	best_acc = 0
 	if args.centered:
 		for inv in [True, False]:
 			w = from_acts_to_weights(sol, args.dataset_size, inv)
 			net = MLP(args.student)
 			net.W1.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
 			#acc_before = eval_net(net, dataset)
-			acc_before = 0.0
 			for param in net.W1.parameters():
 				param.requires_grad = False
 			acc_after = train_net(net, mnist_train, mnist_test, args)
+			best_acc = max(best_acc, acc_after)
 	else:
 		for b in range(8):
 			for inv in [True, False]:
@@ -124,11 +128,12 @@ def evaluate_solution(sol, args, config):
 				net = MLP(args.student)
 				net.W1.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
 				#acc_before = eval_net(net, dataset)
-				acc_before = 0.0
 				for param in net.W1.parameters():
 					param.requires_grad = False
 				acc_after = train_net(net, mnist_train, mnist_test, args)
-	return max(acc_before, acc_after)
+				best_acc = max(best_acc, acc_after)
+
+	return best_acc
 		
 
 if __name__ == "__main__":
