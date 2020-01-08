@@ -1,4 +1,4 @@
-# from comet_ml import Experiment
+from comet_ml import Experiment
 import os
 import numpy as np
 import torch
@@ -65,6 +65,9 @@ def optimize_pytorch(config, args, expermient):
 		net.Y.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
 	if args.cuda:
 		net = net.cuda()
+		net = net.half()	
+
+
 	optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.8)
 	iter = 0
 	EPOCHS = args.epochs
@@ -72,7 +75,7 @@ def optimize_pytorch(config, args, expermient):
 	# for epoch in range(24000):
 		loss = 0
 		net.train()
-		apply_penalty = epoch//(EPOCHS//3) % 2
+		apply_penalty = epoch//(EPOCHS//15) % 2
 		if args.resume:
 			apply_penalty = 0
 		if apply_penalty:
@@ -80,6 +83,7 @@ def optimize_pytorch(config, args, expermient):
 		else:
 			adjust_learning_rate(optimizer, config['lr_no_penalty'])
 		for (data, target) in loader:
+
 			iter += 1
 			optimizer.zero_grad()
 			pred = net(data)
@@ -137,20 +141,21 @@ def evaluate_solution(sol, args, config):
 		
 
 if __name__ == "__main__":
-	# experiment = Experiment(api_key="1UNrcJdirU9MEY0RC3UCU7eAg",
-	# 								project_name="nni-opt-0",
-	# 									workspace="neurozip",
-	# 								auto_param_logging=False,
-	# 								auto_metric_logging=False,
-	# 								log_env_gpu=False,
-	# 								auto_output_logging=False,
-	# 								log_env_details=False,
-	# 								log_env_cpu=False,
-	# 								log_git_patch=False)
+	experiment = Experiment(api_key="1UNrcJdirU9MEY0RC3UCU7eAg",
+									project_name="mnist-16-8",
+										workspace="neurozip",
+									auto_param_logging=False,
+									auto_metric_logging=False,
+									log_env_gpu=False,
+									auto_output_logging=False,
+									log_env_details=False,
+									log_env_cpu=False,
+									log_git_patch=False,
+									disabled=False)
 	trial_id = os.environ.get('NNI_TRIAL_JOB_ID')
 	args = parse_arguments()
-	config = nni.get_next_parameter()
-	# config = mock_nni_config()
+	# config = nni.get_next_parameter()
+	config = mock_nni_config()
 	print(args.teacher, args.student, args.epochs)
 	print(config)
 	sol = optimize_pytorch(config, args, 12)
@@ -159,7 +164,8 @@ if __name__ == "__main__":
 	score = evaluate_solution(sol, args, config)
 	print("***"*20)
 	print(score)
-	nni.report_final_result(score)
-	# experiment.log_parameters(config)
-	# experiment.log_metric(name='score', value=score)
-	# experiment.end()
+	# nni.report_final_result(score)
+	experiment.disabled = True
+	experiment.log_parameters(config)
+	experiment.log_metric(name='score', value=score)
+	experiment.end()
