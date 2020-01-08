@@ -73,10 +73,11 @@ def create_pytorch_data_loader(epoch, dataset_size, model_size, centered_acts, c
 		u1, s1, v1 = torch.svd(y[i])
 		if cuda:
 			s1 = s1.cuda()
+			s1 = s1.half()
 		svds.append(s1)
 	if cuda:
-		X = X.cuda()
-		y = y.cuda()
+		X = X.cuda().half()
+		y = y.cuda().half()
 	dataset = TensorDataset(X, y)
 	loader = DataLoader(dataset=dataset, batch_size=128, shuffle=False)
 	return loader, samples, svds
