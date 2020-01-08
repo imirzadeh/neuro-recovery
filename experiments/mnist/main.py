@@ -65,8 +65,6 @@ def optimize_pytorch(config, args, expermient):
 		net.Y.weight = torch.nn.parameter.Parameter(torch.from_numpy(w.T).float()) 
 	if args.cuda:
 		net = net.cuda()
-		net = net.half()	
-
 
 	optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.8)
 	iter = 0
