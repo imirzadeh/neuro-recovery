@@ -13,7 +13,7 @@ def str2bool(v):
 	
 def parse_arguments():
 	parser = argparse.ArgumentParser(description='Neuro Zip')
-	parser.add_argument('--epochs', default=200000, type=int,  help='number of total epochs to run')
+	# parser.add_argument('--epochs', default=21000, type=int,  help='number of total epochs to run')
 	parser.add_argument('--log_every', default=1000, type=int,  help='log every?')
 	parser.add_argument('--dataset', default='mnist', type=str, help='dataset.')
 	parser.add_argument('--teacher', default=8, type=int, help='teacher size')
@@ -34,5 +34,6 @@ def mock_nni_config():
 			 "lambda_svd": 5,
 			 "lambda_minmax": 2,
   			 "target_epoch": 15,
-  			 "centered": False
+  			 "centered": False,
+  			 "num_epochs": 9000,
   			  }

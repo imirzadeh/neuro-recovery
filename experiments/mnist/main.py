@@ -70,7 +70,7 @@ def optimize_pytorch(config, args, expermient):
 
 	optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.8)
 	iter = 0
-	EPOCHS = args.epochs
+	EPOCHS = config["num_epochs"]
 	for epoch in range(EPOCHS):
 	# for epoch in range(24000):
 		loss = 0
@@ -154,9 +154,9 @@ if __name__ == "__main__":
 									disabled=False)
 	trial_id = os.environ.get('NNI_TRIAL_JOB_ID')
 	args = parse_arguments()
-	# config = nni.get_next_parameter()
-	config = mock_nni_config()
-	print(args.teacher, args.student, args.epochs)
+	config = nni.get_next_parameter()
+	# config = mock_nni_config()
+	print(args.teacher, args.student)
 	print(config)
 	sol = optimize_pytorch(config, args, 12)
 	solution_file = './sols/{}.npy'.format(trial_id)
