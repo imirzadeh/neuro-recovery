@@ -140,7 +140,7 @@ def evaluate_solution(sol, args, config):
 
 if __name__ == "__main__":
 	experiment = Experiment(api_key="1UNrcJdirU9MEY0RC3UCU7eAg",
-									project_name="mnist-16-8",
+									project_name="mnist-16-8-2",
 										workspace="neurozip",
 									auto_param_logging=False,
 									auto_metric_logging=False,
