@@ -77,6 +77,9 @@ def create_pytorch_data_loader(epoch, dataset_size, model_size, centered_acts, c
 	if cuda:
 		X = X.cuda()
 		y = y.cuda()
+	else:
+		X = X.cpu()
+		y = y.cpu()
 	dataset = TensorDataset(X, y)
 	loader = DataLoader(dataset=dataset, batch_size=128, shuffle=False)
 	return loader, samples, svds

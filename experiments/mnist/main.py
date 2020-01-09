@@ -73,7 +73,7 @@ def optimize_pytorch(config, args, expermient):
 	# for epoch in range(24000):
 		loss = 0
 		net.train()
-		apply_penalty = epoch//(EPOCHS//15) % 2
+		apply_penalty = epoch//(EPOCHS//3) % 2
 		if args.resume:
 			apply_penalty = 0
 		if apply_penalty:

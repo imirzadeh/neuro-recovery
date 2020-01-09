@@ -1,0 +1,7 @@
+{ "lr_no_penalty":{"_type":"choice", "_value":[0.05, 0.1]},
+  "lr_penalty":{"_type":"choice", "_value":[0.01, 0.03, 0.05]},
+  "lambda_fro":{"_type":"choice", "_value":[0.1, 3.0, 10.0]},
+  "lambda_svd":{"_type":"choice", "_value":[0.1, 3.0, 10.0]},
+  "target_epoch": {"_type":"choice", "_value":[5, 10, 35]},
+  "num_epochs": {"_type": "choice", "_value": [90000, 360000]}
+}
