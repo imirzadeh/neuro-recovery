@@ -3,5 +3,5 @@
   "lambda_fro":{"_type":"choice", "_value":[0.5, 5.0, 10.0]},
   "lambda_svd":{"_type":"choice", "_value":[0.5, 5.0, 10.0]},
   "target_epoch": {"_type":"choice", "_value":[5, 10, 35]},
-  "num_epochs": {"_type": "choice", "_value": [90000, 150000, 360000]}
+  "num_epochs": {"_type": "choice", "_value": [600000]}
 }
