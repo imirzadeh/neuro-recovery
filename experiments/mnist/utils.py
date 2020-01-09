@@ -28,12 +28,12 @@ def parse_arguments():
 
 
 def mock_nni_config():
-	return  { "lr_no_penalty": 0.3,
-			 "lr_penalty": 0.05,
-			 "lambda_fro": 15,
-			 "lambda_svd": 5,
+	return  { "lr_no_penalty": 0.1,
+			 "lr_penalty": 0.03,
+			 "lambda_fro": 10,
+			 "lambda_svd": 10,
 			 "lambda_minmax": 2,
-  			 "target_epoch": 15,
-  			 "centered": False,
-  			 "num_epochs": 150000,
+  			 "target_epoch": 5,
+  			 "centered": True,
+  			 "num_epochs": 600000,
   			  }

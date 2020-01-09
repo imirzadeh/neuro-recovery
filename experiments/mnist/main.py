@@ -112,7 +112,7 @@ def evaluate_solution(sol, args, config):
 	#dataset = load_dataset(make_tensors=True, num_data_points=args.dataset_size)
 	mnist_train, mnist_test = get_mnist_loaders(args)
 	best_acc = 0
-	if args.centered:
+	if args.centered is False:
 		for inv in [True, False]:
 			w = from_acts_to_weights(sol, args.dataset_size, inv)
 			net = MLP(args.student)
@@ -162,7 +162,7 @@ if __name__ == "__main__":
 	score = evaluate_solution(sol, args, config)
 	print("***"*20)
 	print(score)
-	# nni.report_final_result(score)
+	nni.report_final_result(score)
 	experiment.disabled = True
 	experiment.log_parameters(config)
 	experiment.log_metric(name='score', value=score)
