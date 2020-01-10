@@ -140,7 +140,7 @@ def evaluate_solution(sol, args, config):
 
 if __name__ == "__main__":
 	experiment = Experiment(api_key="1UNrcJdirU9MEY0RC3UCU7eAg",
-									project_name="mnist-16-8-2",
+									project_name="mnist-32-8-500",
 										workspace="neurozip",
 									auto_param_logging=False,
 									auto_metric_logging=False,
@@ -163,7 +163,7 @@ if __name__ == "__main__":
 	print("***"*20)
 	print(score)
 	nni.report_final_result(score)
-	experiment.disabled = True
+	# experiment.disabled = True
 	experiment.log_parameters(config)
 	experiment.log_metric(name='score', value=score)
 	experiment.end()

@@ -1,12 +1,12 @@
 authorName: Iman Mirzadeh
-experimentName: NeuroZip-16-8-CPU
+experimentName: NeuroZip-16-8-CPU-3
 trialConcurrency: 4
 maxExecDuration: 24h
 maxTrialNum: 100
 
 #choice: local, remote, pai
 trainingServicePlatform: local
-searchSpacePath: search_space_cpu_1.json
+searchSpacePath: search_space_cpu_3.json
 #choice: true, false
 useAnnotation: false
 tuner:

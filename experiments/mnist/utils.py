@@ -16,10 +16,10 @@ def parse_arguments():
 	# parser.add_argument('--epochs', default=21000, type=int,  help='number of total epochs to run')
 	parser.add_argument('--log_every', default=1000, type=int,  help='log every?')
 	parser.add_argument('--dataset', default='mnist', type=str, help='dataset.')
-	parser.add_argument('--teacher', default=16, type=int, help='teacher size')
+	parser.add_argument('--teacher', default=32, type=int, help='teacher size')
 	parser.add_argument('--student', '--model', default=8, type=int, help='student size')
 	parser.add_argument('--cuda', default=False, type=str2bool, help='whether or not use cuda(train on GPU)')
-	parser.add_argument('--centered', default=False, type=str2bool, help='zero-mean by shift?')
+	parser.add_argument('--centered', default=True, type=str2bool, help='zero-mean by shift?')
 	parser.add_argument('--normalize_penalty', default=True, type=str2bool, help='[0, 1] penalty?')
 	parser.add_argument('--dataset_size', default=500, type=int, help='dataset size')
 	parser.add_argument('--resume', default='', type=str, help='resume')
@@ -28,12 +28,12 @@ def parse_arguments():
 
 
 def mock_nni_config():
-	return  { "lr_no_penalty": 0.1,
-			 "lr_penalty": 0.03,
+	return  { "lr_no_penalty": 0.01,
+			 "lr_penalty": 0.01,
 			 "lambda_fro": 10,
 			 "lambda_svd": 10,
 			 "lambda_minmax": 2,
   			 "target_epoch": 5,
   			 "centered": True,
-  			 "num_epochs": 600000,
+  			 "num_epochs": 480000,
   			  }
