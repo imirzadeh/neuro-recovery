@@ -1,7 +1,7 @@
 { "lr_no_penalty":{"_type":"choice", "_value":[0.05, 0.1]},
-  "lr_penalty":{"_type":"choice", "_value":[0.02, 0.06]},
-  "lambda_fro":{"_type":"choice", "_value":[5.0, 10.0]},
-  "lambda_svd":{"_type":"choice", "_value":[5.0, 10.0]},
+  "lr_penalty":{"_type":"choice", "_value":[0.01]},
+  "lambda_fro":{"_type":"choice", "_value":[0, 5.0, 10.0, 40]},
+  "lambda_svd":{"_type":"choice", "_value":[0, 5.0, 10.0, 40]},
   "target_epoch": {"_type":"choice", "_value":[5]},
-  "num_epochs": {"_type": "choice", "_value": [480000]}
+  "num_epochs": {"_type": "choice", "_value": [360000]}
 }

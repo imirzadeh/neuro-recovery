@@ -1,6 +1,6 @@
 authorName: Iman Mirzadeh
 experimentName: NeuroZip-16-8-CPU
-trialConcurrency: 4
+trialConcurrency: 2
 maxExecDuration: 24h
 maxTrialNum: 100
 
