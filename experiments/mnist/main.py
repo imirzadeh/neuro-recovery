@@ -166,4 +166,5 @@ if __name__ == "__main__":
 	# experiment.disabled = True
 	experiment.log_parameters(config)
 	experiment.log_metric(name='score', value=score)
+	experiment.log_asset(solution_file)
 	experiment.end()
