@@ -73,7 +73,7 @@ def optimize_pytorch(config, args, expermient):
 	# for epoch in range(24000):
 		loss = 0
 		net.train()
-		apply_penalty = epoch//(EPOCHS//3) % 2
+		apply_penalty = epoch//(EPOCHS//config['epoch_div']) % 2
 		if args.resume:
 			apply_penalty = 0
 		if apply_penalty:
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 									auto_metric_logging=False,
 									log_env_gpu=False,
 									auto_output_logging=False,
-									log_env_details=False,
+									log_env_details=True,
 									log_env_cpu=False,
 									log_git_patch=False,
 									disabled=False)
