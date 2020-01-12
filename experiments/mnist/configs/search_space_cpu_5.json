@@ -3,6 +3,6 @@
   "lambda_fro":{"_type":"quniform", "_value":[1, 70, 5]},
   "lambda_svd":{"_type":"quniform", "_value":[1, 70, 5]},
   "target_epoch": {"_type":"choice", "_value":[5]},
-  "epoch_div": {"_type":"choice", "_value":[3, 5]},
-  "num_epochs": {"_type": "choice", "_value": [250000, 360000]}
+  "epoch_div": {"_type":"choice", "_value":[5]},
+  "num_epochs": {"_type": "choice", "_value": [150000, 210000]}
 }

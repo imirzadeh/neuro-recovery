@@ -1,0 +1,21 @@
+authorName: Iman Mirzadeh
+experimentName: NeuroZip-16-8-CPU-4
+trialConcurrency: 2
+maxExecDuration: 24h
+maxTrialNum: 100
+
+#choice: local, remote, pai
+trainingServicePlatform: local
+searchSpacePath: search_space_cpu_4.json
+#choice: true, false
+useAnnotation: false
+tuner:
+  #choice: TPE, Random, Anneal, Evolution, BatchTuner
+  #SMAC (SMAC should be installed through nnictl)
+  builtinTunerName: TPE
+  classArgs:
+    optimize_mode: maximize
+trial:
+  command: python main.py --teacher 32 --student 8 --dataset_size 500 --cuda 0 --normalize_penalty 1 --centered 1
+  codeDir: ..
+  gpuNum: 0
