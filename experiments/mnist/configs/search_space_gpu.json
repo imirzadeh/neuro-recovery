@@ -1,8 +1,8 @@
 { "lr_no_penalty":{"_type":"quniform", "_value":[0.05, 0.25, 0.05]},
-  "lr_penalty":{"_type":"quniform", "_value":[0.01, 0.05, 0.01]},
-  "lambda_fro":{"_type":"quniform", "_value":[1, 70, 5]},
-  "lambda_svd":{"_type":"quniform", "_value":[1, 70, 5]},
-  "target_epoch": {"_type":"choice", "_value":[5]},
-  "epoch_div": {"_type":"choice", "_value":[3, 5]},
-  "num_epochs": {"_type": "choice", "_value": [250000, 360000]}
+  "lr_penalty":{"_type":"quniform", "_value":[0.005, 0.020, 0.005]},
+  "lambda_fro":{"_type":"quniform", "_value":[2, 40, 5]},
+  "lambda_svd":{"_type":"quniform", "_value":[2, 40, 5]},
+  "target_epoch": {"_type":"choice", "_value":[5, 10]},
+  "epoch_div": {"_type":"choice", "_value":[5]},
+  "num_epochs": {"_type": "choice", "_value": [450000, 550000]}
 }
