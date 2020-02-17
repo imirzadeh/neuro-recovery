@@ -4,5 +4,5 @@
   "lambda_svd":{"_type":"quniform", "_value":[1, 40, 5]},
   "target_epoch": {"_type":"choice", "_value":[5, 10]},
   "epoch_div": {"_type":"choice", "_value":[5]},
-  "num_epochs": {"_type": "choice", "_value": [150000, 250000]}
+  "num_epochs": {"_type": "choice", "_value": [180000, 250000]}
 }
